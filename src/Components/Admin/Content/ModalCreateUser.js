@@ -3,11 +3,12 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import './ModalCreateUser.scss';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+
 
 const ModalCreateUser = (props) => {
-    const { show, setShow} = props;
+    const { show, setShow } = props;
     const handleClose = () => setShow(false);
-
     const resetModal = () => {
         setEmail('');
         setPassword('');
@@ -15,6 +16,19 @@ const ModalCreateUser = (props) => {
         setRole('USER');
         setImage('');
         setPreviewImage('');
+    }
+    const validateEmail = (email) => {
+        return String(email)
+            .toLowerCase()
+            .match(
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            );
+    };
+    const validateUsername = (username) => {
+        return String(username)
+            .toLowerCase()
+            .match(/^[a-zA-Z0-9]+$/);
+
     }
 
     const [email, setEmail] = useState("");
@@ -31,17 +45,38 @@ const ModalCreateUser = (props) => {
         }
     }
 
-    const handleSubmitModal = async() => {
+    const handleSubmitModal = async () => {
+        //validate
+        const isValidEmail = validateEmail(email);
+        const isValidUsername = validateUsername(username);
+        if (!isValidEmail) {
+            toast.error("invalid email");
+            return;
+        }
+        if (!password) {
+            toast.error("invalid password");
+            return;
+        }
+        if (!isValidUsername) {
+            toast.error("invalid username");
+            return;
+        }
         const data = new FormData();
         data.append('email', email);
         data.append('password', password);
         data.append('username', username);
         data.append('role', role);
         data.append('userImage', image);
-
         const res = await axios.post('http://localhost:8081/api/v1/participant', data);
-        console.log("check res:", res.data);
-        resetModal();
+        if (res.data && res.data.EC === 0) {
+            toast.success(res.data.EM);
+            handleClose();
+            resetModal();
+        }
+
+        if (res.data && res.data.EC !== 0) {
+            toast.error(res.data.EM);
+        }
     }
 
     return (
