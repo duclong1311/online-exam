@@ -2,8 +2,8 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import './ModalCreateUser.scss';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import { postCreateUser } from '../../../Utils/apiServices.js';
 
 
 const ModalCreateUser = (props) => {
@@ -61,21 +61,17 @@ const ModalCreateUser = (props) => {
             toast.error("invalid username");
             return;
         }
-        const data = new FormData();
-        data.append('email', email);
-        data.append('password', password);
-        data.append('username', username);
-        data.append('role', role);
-        data.append('userImage', image);
-        const res = await axios.post('http://localhost:8081/api/v1/participant', data);
-        if (res.data && res.data.EC === 0) {
-            toast.success(res.data.EM);
+        
+        const data = await postCreateUser(email, password, username, role, image);
+
+        if (data && data.EC === 0) {
+            toast.success(data.EM);
             handleClose();
             resetModal();
         }
 
-        if (res.data && res.data.EC !== 0) {
-            toast.error(res.data.EM);
+        if (data && data.EC !== 0) {
+            toast.error(data.EM);
         }
     }
 
