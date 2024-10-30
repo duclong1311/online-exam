@@ -1,8 +1,22 @@
-import { useState } from "react";
 import ModalCreateUser from "./ModalCreateUser";
+import TableUser from "./TableUser";
+import { useEffect, useState } from "react";
+import { getAllUserService } from "../../../Utils/apiServices";
 
 const ManageUser = (props) => {
     const [showModalCreateUser, setShowModalCreateUser] = useState(false);
+    const [listUsers, setListUsers] = useState([]);
+
+    useEffect(() => {
+        fetchListUser();
+    }, []);
+
+    const fetchListUser = async () => {
+        const res = await getAllUserService()
+        if (res.EC === 0) {
+            setListUsers(res.DT);
+        }
+    }
 
     return (
         <>
@@ -15,9 +29,13 @@ const ManageUser = (props) => {
                         <button className="btn btn-primary" onClick={() => setShowModalCreateUser(true)}>Add new users</button>
                     </div>
                     <div>
-                        Table users
+                        <TableUser listUsers={listUsers} />
                     </div>
-                    <ModalCreateUser show={showModalCreateUser} setShow={setShowModalCreateUser} />
+                    <ModalCreateUser
+                        show={showModalCreateUser}
+                        setShow={setShowModalCreateUser}
+                        fetchListUser={fetchListUser}
+                    />
                 </div>
             </div>
         </>
