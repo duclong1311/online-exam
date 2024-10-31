@@ -2,67 +2,32 @@ import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import './ModalCreateUser.scss';
-import { toast } from 'react-toastify';
-import { putUpdateUser } from '../../../Utils/apiServices.js';
 import _ from 'lodash';
 import defaultAvatar from '../../../Assets/default-avatar-icon-of-social-media-user-vector.jpg';
 
 
-const ModalUpdateUser = (props) => {
-    const { show, setShow, fetchListUser, dataUpdate } = props;
+const ModalViewUser = (props) => {
+    const { show, setShow, dataView } = props;
     const handleClose = () => setShow(false);
 
-    const validateUsername = (username) => {
-        return String(username)
-            .toLowerCase()
-            .match(/^[a-zA-Z0-9]+$/);
-
-    }
-
-    const [email, setEmail] = useState(dataUpdate?.email || "");
-    const [password, setPassword] = useState(dataUpdate?.password || "");
-    const [username, setUsername] = useState(dataUpdate?.username || "");
-    const [role, setRole] = useState(dataUpdate?.role || "USER");
-    const [image, setImage] = useState(null);
+    const [email, setEmail] = useState(dataView?.email || "");
+    const [password, setPassword] = useState(dataView?.password || "");
+    const [username, setUsername] = useState(dataView?.username || "");
+    const [role, setRole] = useState(dataView?.role || "USER");
     const [previewImage, setPreviewImage] = useState(defaultAvatar); // Avatar mặc định ngay từ đầu
 
     useEffect(() => {
-        if (!_.isEmpty(dataUpdate)) {
-            setEmail(dataUpdate.email || "");
-            setPassword(dataUpdate.password || "");
-            setUsername(dataUpdate.username || "");
-            setRole(dataUpdate.role || "USER");
+        if (!_.isEmpty(dataView)) {
+            setEmail(dataView.email || "");
+            setPassword(dataView.password || "");
+            setUsername(dataView.username || "");
+            setRole(dataView.role || "USER");
             setPreviewImage(
-                dataUpdate.image ? `data:image/jpeg;base64,${dataUpdate.image}` : defaultAvatar
+                dataView.image ? `data:image/jpeg;base64,${dataView.image}` : defaultAvatar
             );
         }
-    }, [dataUpdate]);
+    }, [dataView]);
 
-    const handleUploadImage = (event) => {
-        if (event.target && event.target.files && event.target.files[0]) {
-            setPreviewImage(URL.createObjectURL(event.target.files[0]))
-            setImage(event.target.files[0]);
-        }
-    }
-
-    const handleSubmitModal = async () => {
-        //validate
-        const isValidUsername = validateUsername(username);
-        if (!isValidUsername) {
-            toast.error("invalid username");
-            return;
-        }
-
-        const data = await putUpdateUser(dataUpdate.id, username, role, image);
-        if (data && data.EC === 0) {
-            toast.success(data.EM);
-            handleClose();
-            await fetchListUser();
-        }
-        if (data && data.EC !== 0) {
-            toast.error(data.EM);
-        }
-    }
     return (
         <>
             <Modal
@@ -103,6 +68,7 @@ const ModalUpdateUser = (props) => {
                             <input
                                 type="text"
                                 className="form-control"
+                                disabled={true}
                                 value={username}
                                 onChange={(event) => setUsername(event.target.value)}
                             />
@@ -113,6 +79,7 @@ const ModalUpdateUser = (props) => {
                                 className="form-select"
                                 onChange={(event) => setRole(event.target.value)}
                                 value={role}
+                                disabled={true}
                             >
                                 <option value={"User"}>USER</option>
                                 <option value={"ADMIN"}>ADMIN</option>
@@ -123,11 +90,11 @@ const ModalUpdateUser = (props) => {
                             <input
                                 className="form-control"
                                 type="file"
-                                onChange={(event) => handleUploadImage(event)}
+                                disabled={true}
                             />
                         </div>
                         <div className='col-md-12 img-fluid img-preview'>
-                            {previewImage ? <img src={previewImage} alt='Avatar preview'/> : <span>Preview Image</span>}
+                            {previewImage ? <img src={previewImage} alt='Avatar preview' /> : <span>Preview Image</span>}
                         </div>
                     </form>
                 </Modal.Body>
@@ -136,13 +103,10 @@ const ModalUpdateUser = (props) => {
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
-                    <Button variant="primary" onClick={() => handleSubmitModal()}>
-                        Save Changes
-                    </Button>
                 </Modal.Footer>
             </Modal>
         </>
     );
 }
 
-export default ModalUpdateUser;
+export default ModalViewUser;
