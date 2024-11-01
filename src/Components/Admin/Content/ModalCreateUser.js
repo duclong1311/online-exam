@@ -6,8 +6,7 @@ import { toast } from 'react-toastify';
 import { postCreateUser } from '../../../Utils/apiServices.js';
 
 
-const ModalCreateUser = (props) => {
-    const { show, setShow, fetchListUser } = props;
+const ModalCreateUser = ({ show, setShow, fetchListUserWithPaginate, setCurrentPage }) => {
     const handleClose = () => setShow(false);
     const resetModal = () => {
         setEmail('');
@@ -68,7 +67,8 @@ const ModalCreateUser = (props) => {
             toast.success(data.EM);
             handleClose();
             resetModal();
-            await fetchListUser();
+            await fetchListUserWithPaginate(1);
+            setCurrentPage(1);
         }
 
         if (data && data.EC !== 0) {

@@ -9,7 +9,7 @@ import defaultAvatar from '../../../Assets/default-avatar-icon-of-social-media-u
 
 
 const ModalUpdateUser = (props) => {
-    const { show, setShow, fetchListUser, dataUpdate } = props;
+    const { show, setShow, dataUpdate, currentPage, fetchListUserWithPaginate } = props;
     const handleClose = () => setShow(false);
 
     const validateUsername = (username) => {
@@ -57,7 +57,7 @@ const ModalUpdateUser = (props) => {
         if (data && data.EC === 0) {
             toast.success(data.EM);
             handleClose();
-            await fetchListUser();
+            await fetchListUserWithPaginate(currentPage);
         }
         if (data && data.EC !== 0) {
             toast.error(data.EM);

@@ -17,6 +17,11 @@
         .admin-main {
             margin: 20px;
 
+            .user-pagination {
+                display: flex;
+                justify-content: center;
+            }
+
             .title {
                 margin: 10px 0;
                 font-weight: 500;
