@@ -79,7 +79,7 @@ const Login = () => {
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                 </div>
-                                <Button type="submit" className="w-100 mt-3">Login</Button>
+                                <Button type="submit" className="w-100 mt-3 btn-dark">Login</Button>
                             </Form>
                         </div>
                     </div>
