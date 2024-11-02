@@ -5,6 +5,9 @@ import { Formik, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import './Login.scss';
+import { postLogin } from '../../Utils/apiServices';
+import { toast } from 'react-toastify';
+
 
 const Login = () => {
     const navigate = useNavigate();
@@ -14,8 +17,15 @@ const Login = () => {
         password: yup.string().required('Password is required'),
     });
 
-    const handleSubmit = (values) => {
-        console.log("Form submitted with values:", values);
+    const handleSubmit = async (values) => {
+        const data = await postLogin(values.username, values.password);
+        if (data && data.EC === 0) {
+            toast.success(data.EM);
+            navigate('/');
+        }
+        if (data && data.EC !== 0) {
+            toast.error(data.EM);
+        }
     };
 
     return (
