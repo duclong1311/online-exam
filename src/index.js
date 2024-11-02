@@ -9,6 +9,8 @@ import User from './Components/User/User';
 import HomePage from './Components/Home/HomePage';
 import ManageUser from './Components/Admin/Content/ManageUser';
 import DashBoard from './Components/Admin/Content/DashBoard';
+import Login from './Components/Auth/Login';
+import Register from './Components/Auth/Register';
 
 
 
@@ -26,6 +28,9 @@ root.render(
           <Route index element={<DashBoard />} />
           <Route path='/admin/manage-user' element={<ManageUser />} />
         </Route>
+
+        <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Register />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
