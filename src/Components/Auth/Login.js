@@ -7,10 +7,13 @@ import { useNavigate } from 'react-router-dom';
 import './Login.scss';
 import { postLogin } from '../../Utils/apiServices';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { doLogin } from '../../Redux/Actions/userActions';
 
 
 const Login = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const schema = yup.object().shape({
         username: yup.string().required('Username is required'),
@@ -20,6 +23,7 @@ const Login = () => {
     const handleSubmit = async (values) => {
         const data = await postLogin(values.username, values.password);
         if (data && data.EC === 0) {
+            dispatch(doLogin(data));
             toast.success(data.EM);
             navigate('/');
         }
