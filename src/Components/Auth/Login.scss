@@ -4,6 +4,29 @@
     align-items: center;
     gap: 40px;
 
+    .btn-dark {
+        position: relative;
+
+        .loader-icon {
+            position: absolute;
+            margin-right: 7px;
+            top: 2px;
+            animation: spin 1s infinite linear;
+            top: 12px;
+            right: 15px;
+        }
+    }
+
+    @keyframes spin {
+        from {
+            transform: scale(1) rotate(0deg);
+        }
+
+        to {
+            transform: scale(1) rotate(360deg);
+        }
+    }
+
     .header {
         height: 45px;
         margin-top: 10px;

@@ -9,11 +9,13 @@ import { postLogin } from '../../Utils/apiServices';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { doLogin } from '../../Redux/Actions/userActions';
-
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { useState } from 'react';
 
 const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [isLoading, setIsLoading] = useState(false);
 
     const schema = yup.object().shape({
         username: yup.string().required('Username is required'),
@@ -21,14 +23,17 @@ const Login = () => {
     });
 
     const handleSubmit = async (values) => {
+        setIsLoading(true);
         const data = await postLogin(values.username, values.password);
         if (data && data.EC === 0) {
             dispatch(doLogin(data));
             toast.success(data.EM);
+            setIsLoading(false);
             navigate('/');
         }
         if (data && data.EC !== 0) {
             toast.error(data.EM);
+            setIsLoading(false);
         }
     };
 
@@ -83,7 +88,16 @@ const Login = () => {
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                 </div>
-                                <Button type="submit" className="w-100 mt-3 btn-dark">Login</Button>
+                                <Button type="submit" className="w-100 mt-3 btn-dark" disabled={isLoading}>
+                                    Login
+                                    {
+                                        isLoading === true && 
+                                        <span>
+                                            <AiOutlineLoading3Quarters className='loader-icon' />
+                                        </span>
+                                    }
+                                    
+                                </Button>
                             </Form>
                         </div>
                     </div>
