@@ -11,11 +11,14 @@ import { useDispatch } from 'react-redux';
 import { doLogin } from '../../Redux/Actions/userActions';
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useState } from 'react';
+import { LiaEyeSlashSolid } from "react-icons/lia";
+import { LiaEyeSolid } from "react-icons/lia";
 
 const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(false);
+    const [isShowPassword, setIsShowPassword] = useState(false);
 
     const schema = yup.object().shape({
         username: yup.string().required('Username is required'),
@@ -77,12 +80,24 @@ const Login = () => {
                                     <Form.Group as={Col} md="12" controlId="validation-password">
                                         <Form.Label>Password</Form.Label>
                                         <Form.Control
-                                            type="password"
+                                            type={isShowPassword ? "text" : "password"}
                                             name="password"
                                             value={values.password}
                                             onChange={handleChange}
                                             isInvalid={touched.password && !!errors.password}
                                         />
+                                        {
+                                            isShowPassword ?
+                                                <span className='icon-eyes'
+                                                    onClick={() => setIsShowPassword(false)}>
+                                                    <LiaEyeSolid />
+                                                </span>
+                                                :
+                                                <span className='icon-eyes'
+                                                    onClick={() => setIsShowPassword(true)}>
+                                                    <LiaEyeSlashSolid />
+                                                </span>
+                                        }
                                         <Form.Control.Feedback type='invalid'>
                                             <ErrorMessage name="password" />
                                         </Form.Control.Feedback>
