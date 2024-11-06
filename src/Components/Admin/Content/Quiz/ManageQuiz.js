@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { postCreateNewQuiz } from '../../../../Utils/apiServices';
 import { toast } from 'react-toastify';
 import TableQuiz from './TableQuiz';
+import Accordion from 'react-bootstrap/Accordion';
 
 const options = [
     { value: 'easy', label: 'Dễ không cần nhìn vẫn làm được' },
@@ -25,7 +26,7 @@ const ManageQuiz = () => {
     const handleSubmitQuiz = async () => {
         const res = await postCreateNewQuiz(description, name, type?.value, image);
         console.log(res);
-        if(res && res.EC === 0) {
+        if (res && res.EC === 0) {
             toast.success(res.EM);
             setName('');
             setDescription('');
@@ -37,58 +38,67 @@ const ManageQuiz = () => {
     return (
         <>
             <div className="quiz-container">
+                <Accordion defaultActiveKey="0">
+                    <Accordion.Item eventKey="0">
+                        <Accordion.Header>Add a new Quiz</Accordion.Header>
+                        <Accordion.Body>
+                            <hr />
+                            <div className='add-new'>
+                                <fieldset className="border rounded-3 p-3">
+                                    <legend className="float-none w-auto px-3">Add new Quiz:</legend>
+                                    <div className="form-floating mb-3">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Your quiz name..."
+                                            value={name}
+                                            onChange={(event) => setName(event.target.value)}
+                                        />
+                                        <label htmlFor="floatingInput">Name</label>
+                                    </div>
+                                    <div className="form-floating mb-3">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Your quiz description..."
+                                            value={description}
+                                            onChange={(event) => setDescription(event.target.value)}
+                                        />
+                                        <label htmlFor="floatingPassword">Description</label>
+                                    </div>
+                                    <div className='form-floating mb-3'>
+                                        <Select
+                                            options={options}
+                                            defaultValue={type}
+                                            onChange={setType}
+                                            placeholder={"Quiz type..."}
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label htmlFor="formFile" className="form-label">Upload an image</label>
+                                        <input
+                                            className="form-control mb"
+                                            type="file"
+                                            id="formFile"
+                                            onChange={(event) => handleChangeFile(event)}
+                                        />
+                                    </div>
+                                    <div className='mt-3'>
+                                        <button
+                                            className='btn btn-warning'
+                                            onClick={() => handleSubmitQuiz()}
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </Accordion.Body>
+                    </Accordion.Item>
+                </Accordion>
                 <div className="title">
                     Manage Quizzes
                 </div>
-                <hr />
-                <fieldset className="border rounded-3 p-3">
-                    <legend className="float-none w-auto px-3">Add new Quiz:</legend>
-                    <div className="form-floating mb-3">
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Your quiz name..."
-                            value={name}
-                            onChange={(event) => setName(event.target.value)}
-                        />
-                        <label htmlFor="floatingInput">Name</label>
-                    </div>
-                    <div className="form-floating mb-3">
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Your quiz description..."
-                            value={description}
-                            onChange={(event) => setDescription(event.target.value)}
-                        />
-                        <label htmlFor="floatingPassword">Description</label>
-                    </div>
-                    <div className='form-floating mb-3'>
-                        <Select
-                            options={options}
-                            defaultValue={type}
-                            onChange={setType}
-                            placeholder={"Quiz type..."}
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="formFile" className="form-label">Upload an image</label>
-                        <input
-                            className="form-control mb"
-                            type="file"
-                            id="formFile"
-                            onChange={(event) => handleChangeFile(event)}
-                        />
-                    </div>
-                    <div className='mt-3'>
-                        <button
-                            className='btn btn-warning'
-                            onClick={() => handleSubmitQuiz()}
-                        >
-                            Save
-                        </button>
-                    </div>
-                </fieldset>
                 <div className="list-detail">
                     <TableQuiz />
                 </div>

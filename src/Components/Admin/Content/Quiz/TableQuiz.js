@@ -1,33 +1,50 @@
+import { useEffect, useState } from "react";
+import { getAllQuizForAdmin } from "../../../../Utils/apiServices";
+import ListQuiz from "../../../User/ListQuiz";
+
 const TableQuiz = () => {
+    const [listQuiz, setListQuiz] = useState([]);
+
+    useEffect(() => {
+        const fetchQuiz = async () => {
+            const res = await getAllQuizForAdmin();
+            if (res && res.EC === 0) {
+                setListQuiz(res.DT);
+            }
+        }
+        fetchQuiz();
+    }, []);
+
     return (
         <>
-            <table class="table">
+            <div>List Quizzes</div>
+            <table className="table table-hover table-bordered mt-2">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Handle</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">type</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td colspan="2">Larry the Bird</td>
-                        <td>@twitter</td>
-                    </tr>
+                    {
+                        listQuiz && listQuiz.length > 0 && listQuiz.map((item, index) => (
+                            <>
+                                <tr key={`table-quiz-${index}`}>
+                                    <td>{item.id}</td>
+                                    <td>{item.name}</td>
+                                    <td>{item.description}</td>
+                                    <td>{item.difficulty}</td>
+                                    <td style={{display: "flex", gap: "15px"}}>
+                                        <button className="btn btn-warning">Edit</button>
+                                        <button className="btn btn-danger">Delete</button>
+                                    </td>
+                                </tr>
+                            </>
+                        ))
+                    }
                 </tbody>
             </table>
         </>
