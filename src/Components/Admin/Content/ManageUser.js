@@ -35,7 +35,6 @@ const ManageUser = (props) => {
             setListUsers(res.DT.users);
             setPageCount(res.DT.totalPages)
         }
-        console.log("action with user at page:", page);
     }
     const handleClickUpdate = (user) => {
         setShowModalUpdateUser(true);

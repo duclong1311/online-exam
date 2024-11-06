@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { getQuizDetail } from "../../Utils/apiServices";
+import { getQuizDetail, postSubmitQuiz } from "../../Utils/apiServices";
 import _ from "lodash";
 import "./DetailQuiz.scss";
 import Question from "./Question";
+import ModalResult from "./ModalResult";
 
 const DetailQuiz = (props) => {
     const params = useParams();
     const location = useLocation();
     const quizId = params.id;
-
     const [dataQuiz, setDataQuiz] = useState([]);
     const [index, setIndex] = useState(0);
+    const [isShowModalResult, setIsShowModalResult] = useState(false);
+    const [dataModalResult, setDataModalResult] = useState({});
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -32,7 +34,6 @@ const DetailQuiz = (props) => {
                         return { questionId: key, answers, questionDescription, image };
                     })
                     .value()
-                console.log(data);
                 setDataQuiz(data);
             }
         };
@@ -50,13 +51,52 @@ const DetailQuiz = (props) => {
             setIndex(index + 1);
     };
 
+    const handleFinishQuiz = async () => {
+        let payload = {
+            quizId: +quizId,
+            answers: [],
+        };
+
+        let answers = [];
+        if (dataQuiz && dataQuiz.length > 0) {
+            dataQuiz.forEach(question => {
+                let questionId = +question.questionId;
+                let userAnswerId = [];
+
+                question.answers.forEach(a => {
+                    if (a.isSelected) {
+                        userAnswerId.push(a.id);
+                    }
+                })
+
+                answers.push({
+                    questionId,
+                    userAnswerId
+                })
+            });
+            payload.answers = answers;
+
+            const res = await postSubmitQuiz(payload);
+            if (res && res.EC === 0) {
+                setIsShowModalResult(true);
+                setDataModalResult({
+                    quizData: res.DT.quizData,
+                    countCorrect: res.DT.countCorrect,
+                    countTotal: res.DT.countTotal,
+                });
+            } else {
+                alert('waring');
+            }
+        }
+    };
+
     const handleCheckBox = (answerId, questionId) => {
         let dataQuizClone = _.cloneDeep(dataQuiz);
         let question = dataQuizClone.find(item => +item.questionId === +questionId);
         if (question && question.answers) { // Tìm xem có question nào có thuộc tính answer thay đổi hay không
             question.answers = question.answers.map(item => {
                 if (+item.id === +answerId) { // Tìm xem answer nào được người dùng click hay không
-                    item.isSelected = !item.isSelected; 
+                    item.isSelected = !item.isSelected;
                 }
                 return item;
             });
@@ -97,7 +137,7 @@ const DetailQuiz = (props) => {
                     </button>
                     <button
                         className="btn btn-warning"
-                        onClick={() => handleNext()}
+                        onClick={() => handleFinishQuiz()}
                     >
                         Finish
                     </button>
@@ -106,6 +146,12 @@ const DetailQuiz = (props) => {
             <div className="right-content">
                 count down
             </div>
+            <ModalResult
+                show={isShowModalResult}
+                setShow={setIsShowModalResult}
+                dataModalResult={dataModalResult}
+
+            />
         </div>
     )
 }
