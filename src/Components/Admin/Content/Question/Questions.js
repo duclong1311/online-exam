@@ -5,6 +5,7 @@ import { RiImageAddFill } from "react-icons/ri";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { IoMdRemoveCircleOutline } from "react-icons/io";
 import { v4 as uuidv4 } from 'uuid';
+import Lightbox from "react-awesome-lightbox";
 import _ from 'lodash';
 
 const Questions = () => {
@@ -31,6 +32,12 @@ const Questions = () => {
             }
         ]
     )
+
+    const [isPreviewImage, setIsPreviewImage] = useState(false);
+    const [dataImagePreview, setDataImagePreview] = useState({
+        title: '',
+        url: '',
+    });
 
     const handleAddRemoveQuestion = (type, id) => {
         if (type === 'ADD') {
@@ -111,6 +118,17 @@ const Questions = () => {
         ));
     };
 
+    const handlePreviewImage = (questionId) => {
+        const question = questions.find(item => item.id === questionId);
+        if (question?.imageFile) {
+            setDataImagePreview({
+                url: URL.createObjectURL(question.imageFile),
+                title: question.imageName,
+            });
+            setIsPreviewImage(true);
+        }
+    };
+
     const handleSubmitCreateQuestions = () => {
         console.log("questions", questions);
     };
@@ -161,7 +179,13 @@ const Questions = () => {
                                             onChange={(event) => handleOnChangeImage(question.id, event)}
                                         >
                                         </input>
-                                        <span>{question.imageName ? question.imageName : '0 file is uploaded'}</span>
+                                        <span>
+                                            {
+                                                question.imageName
+                                                    ? <span onClick={() => handlePreviewImage(question.id)}>{question.imageName}</span>
+                                                    : '0 file is uploaded'
+                                            }
+                                        </span>
                                     </div>
                                     <div className='btn-add'>
                                         <button
@@ -179,6 +203,7 @@ const Questions = () => {
                                                 Remove
                                             </button>
                                         }
+                                        
                                     </div>
                                 </div>
                                 {
@@ -227,6 +252,14 @@ const Questions = () => {
                             >
                                 Save Questions</button>
                         </div>
+                    }
+                    {
+                        isPreviewImage === true &&
+                        <Lightbox
+                            image={dataImagePreview.url}
+                            title={dataImagePreview.title}
+                            onClose={() => setIsPreviewImage(false)}
+                        />
                     }
                 </div>
             </div>
