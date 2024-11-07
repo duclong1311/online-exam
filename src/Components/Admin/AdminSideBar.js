@@ -28,6 +28,7 @@ const AdminSideBar = ({ collapsed }) => {
                         <SubMenu label="Manage users" icon={<FaChartBar />}>
                             <MenuItem component={<Link to="/admin/manage-user" />}>Manage users</MenuItem>
                             <MenuItem component={<Link to="/admin/manage-quizzes" />}>Manage quizzes</MenuItem>
+                            <MenuItem component={<Link to="/admin/manage-questions" />}>Manage questions</MenuItem>
                         </SubMenu>
 
                         <div style={{ padding: '0 24px', marginBottom: '8px', marginTop: '32px' }}>Admin</div>

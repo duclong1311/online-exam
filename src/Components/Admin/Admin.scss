@@ -15,8 +15,9 @@
         }
 
         .admin-main {
+            box-sizing: border-box;
             margin: 20px;
-
+            height: calc(100vh - 100px);
             .user-pagination {
                 display: flex;
                 justify-content: center;

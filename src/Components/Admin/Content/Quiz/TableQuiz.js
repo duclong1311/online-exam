@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getAllQuizForAdmin } from "../../../../Utils/apiServices";
-import ListQuiz from "../../../User/ListQuiz";
 
 const TableQuiz = () => {
     const [listQuiz, setListQuiz] = useState([]);
@@ -18,7 +17,7 @@ const TableQuiz = () => {
     return (
         <>
             <div>List Quizzes</div>
-            <table className="table table-hover table-bordered mt-2">
+            <table className="table table-hover table-bordered my-2">
                 <thead>
                     <tr>
                         <th scope="col">ID</th>
