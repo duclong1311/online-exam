@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Select from 'react-select'
 import './Questions.scss';
 import { RiImageAddFill } from "react-icons/ri";
@@ -7,37 +7,49 @@ import { IoMdRemoveCircleOutline } from "react-icons/io";
 import { v4 as uuidv4 } from 'uuid';
 import Lightbox from "react-awesome-lightbox";
 import _ from 'lodash';
+import { getAllQuizForAdmin, createNewAnswerForQuestion, createPostQuestionForQuiz } from "../../../../Utils/apiServices";
+import { toast } from 'react-toastify';
 
 const Questions = () => {
-    const options = [
-        { value: 'EASY', label: 'Easy' },
-        { value: 'MEDIUM', label: 'Medium' },
-        { value: 'HARD', label: 'Hard' }
+    const initQuestions = [
+        {
+            id: uuidv4(),
+            description: 'Question 1',
+            imageFile: '',
+            imageName: '',
+            answers: [
+                {
+                    id: uuidv4(),
+                    description: 'Question 1 - answer 1',
+                    isCorrect: false,
+                }
+            ]
+        }
     ];
-    const [selectedQuiz, setSelectedQuiz] = useState({});
-    const [questions, setQuestions] = useState(
-        [
-            {
-                id: uuidv4(),
-                description: 'Question 1',
-                imageFile: '',
-                imageName: '',
-                answers: [
-                    {
-                        id: uuidv4(),
-                        description: 'Question 1 - answer 1',
-                        isCorrect: false,
-                    }
-                ]
-            }
-        ]
-    )
 
+    const [selectedQuiz, setSelectedQuiz] = useState({});
+    const [questions, setQuestions] = useState(initQuestions);
     const [isPreviewImage, setIsPreviewImage] = useState(false);
     const [dataImagePreview, setDataImagePreview] = useState({
         title: '',
         url: '',
     });
+    const [listQuiz, setListQuiz] = useState([]);
+    useEffect(() => {
+        const fetchQuiz = async () => {
+            const res = await getAllQuizForAdmin();
+            if (res && res.EC === 0) {
+                let newQuiz = res.DT.map((item) => (
+                    {
+                        value: item.id,
+                        label: `${item.id} - ${item.description}`
+                    }
+                ));
+                setListQuiz(newQuiz);
+            }
+        }
+        fetchQuiz();
+    }, []);
 
     const handleAddRemoveQuestion = (type, id) => {
         if (type === 'ADD') {
@@ -129,8 +141,27 @@ const Questions = () => {
         }
     };
 
-    const handleSubmitCreateQuestions = () => {
-        console.log("questions", questions);
+    const validateQuestionDescription = (description) => {
+        return description.trim() !== '';
+    };
+
+    const handleSubmitCreateQuestions = async () => {
+        if (_.isEmpty(selectedQuiz)) {
+            toast.error("Please choose a Quiz!");
+            return;
+        }
+        
+        console.log("questions", questions, selectedQuiz);
+        await Promise.all(questions.map(async (question) => {
+            const q = await createPostQuestionForQuiz(+selectedQuiz.value, question.description, question.imageFile);
+
+            await Promise.all(question.answers.map(async(answer) => {
+                await createNewAnswerForQuestion(answer.description, answer.isCorrect, q.DT.id);
+            }));
+        }));
+
+        toast.success('Create questions ans answers succed!');
+        setQuestions(initQuestions);
     };
 
     return (
@@ -144,7 +175,7 @@ const Questions = () => {
                     <div className='col-6 form-group'>
                         <label className='mb-2'>Select Quiz: </label>
                         <Select
-                            options={options}
+                            options={listQuiz}
                             onChange={setSelectedQuiz}
                             defaultValue={selectedQuiz}
                         />
@@ -160,7 +191,8 @@ const Questions = () => {
                                     <div className="form-floating description">
                                         <input
                                             type="type"
-                                            className="form-control"
+                                            // className="form-control is-invalid"
+                                            className={`form-control ${!validateQuestionDescription(question.description) ? 'is-invalid' : ''}`}
                                             placeholder=""
                                             value={question.description}
                                             onChange={(event) => handleOnChange('QUESTION', question.id, event.target.value)}
@@ -177,6 +209,7 @@ const Questions = () => {
                                             type={'file'}
                                             hidden
                                             onChange={(event) => handleOnChangeImage(question.id, event)}
+
                                         >
                                         </input>
                                         <span>
