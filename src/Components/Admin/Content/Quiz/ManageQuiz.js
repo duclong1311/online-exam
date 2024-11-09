@@ -4,6 +4,8 @@ import { postCreateNewQuiz } from '../../../../Utils/apiServices';
 import { toast } from 'react-toastify';
 import TableQuiz from './TableQuiz';
 import Accordion from 'react-bootstrap/Accordion';
+import QuizQA from './QuizQA';
+import AssignQuiz from './AssignQuiz';
 
 const options = [
     { value: 'easy', label: 'Dễ không cần nhìn vẫn làm được' },
@@ -93,15 +95,32 @@ const ManageQuiz = () => {
                                     </div>
                                 </fieldset>
                             </div>
+                            <div className="list-detail">
+                                <TableQuiz />
+                            </div>
+                        </Accordion.Body>
+                    </Accordion.Item>
+                    <Accordion.Item eventKey="1">
+                        <Accordion.Header>Update Questions</Accordion.Header>
+                        <Accordion.Body>
+                            <div className="list-detail">
+                                <QuizQA />
+                            </div>
+                        </Accordion.Body>
+                    </Accordion.Item>
+                    <Accordion.Item eventKey="2">
+                        <Accordion.Header>Add a new Quiz</Accordion.Header>
+                        <Accordion.Body>
+                            <div className="list-detail">
+                                <AssignQuiz />
+                            </div>
                         </Accordion.Body>
                     </Accordion.Item>
                 </Accordion>
                 <div className="title">
                     Manage Quizzes
                 </div>
-                <div className="list-detail">
-                    <TableQuiz />
-                </div>
+
             </div>
         </>
     )

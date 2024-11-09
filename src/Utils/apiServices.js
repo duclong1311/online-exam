@@ -1,5 +1,10 @@
 import axios from './axiosCustomize.js';
 
+
+const getAllUser = () => {
+    return axios.get('api/v1/participant/all');
+}
+
 const postCreateUser = (email, password, username, role, image) => {
     const data = new FormData();
     data.append('email', email);
@@ -83,7 +88,7 @@ const createNewAnswerForQuestion = (description, correct_answer, question_id) =>
 }
 
 export {
-    postCreateUser, putUpdateUser, deleteUser,
+    postCreateUser, putUpdateUser, deleteUser, getAllUser,
     getUserWithPaginate, postLogin, postRegister,
     getQuizByUser, getQuizDetail, postSubmitQuiz, postCreateNewQuiz,
     getAllQuizForAdmin, createPostQuestionForQuiz, createNewAnswerForQuestion
