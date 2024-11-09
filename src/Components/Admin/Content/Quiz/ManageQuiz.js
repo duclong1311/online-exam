@@ -109,7 +109,7 @@ const ManageQuiz = () => {
                         </Accordion.Body>
                     </Accordion.Item>
                     <Accordion.Item eventKey="2">
-                        <Accordion.Header>Add a new Quiz</Accordion.Header>
+                        <Accordion.Header>Assign Quizz</Accordion.Header>
                         <Accordion.Body>
                             <div className="list-detail">
                                 <AssignQuiz />

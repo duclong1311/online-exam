@@ -7,7 +7,7 @@ import { IoMdRemoveCircleOutline } from "react-icons/io";
 import { v4 as uuidv4 } from 'uuid';
 import Lightbox from "react-awesome-lightbox";
 import _ from 'lodash';
-import { getAllQuizForAdmin, createNewAnswerForQuestion, createPostQuestionForQuiz } from "../../../../Utils/apiServices";
+import { getAllQuizForAdmin, createNewAnswerForQuestion, createPostQuestionForQuiz, getQuizWithQA } from "../../../../Utils/apiServices";
 import { toast } from 'react-toastify';
 
 const QuizQA = () => {
@@ -35,6 +35,7 @@ const QuizQA = () => {
         url: '',
     });
     const [listQuiz, setListQuiz] = useState([]);
+
     useEffect(() => {
         const fetchQuiz = async () => {
             const res = await getAllQuizForAdmin();
@@ -50,6 +51,44 @@ const QuizQA = () => {
         }
         fetchQuiz();
     }, []);
+
+    function urlToFile(url, filename, mimeType) {
+        return fetch(url)
+            .then(res => res.arrayBuffer())
+            .then(buf => new File([buf], filename, { type: mimeType }))
+            .catch(error => {
+                console.error("Lỗi khi chuyển URL thành tệp:", error);
+                return null;
+            });
+    }
+
+    useEffect(() => {
+        const fetchQuizWithQA = async () => {
+            const res = await getQuizWithQA(selectedQuiz.value);
+            if (res && res.EC === 0) {
+                const newQA = await Promise.all(
+                    res.DT.qa.map(async q => {
+                        if (q.imageFile) {
+                            q.imageName = `Question - ${q.id} image`;
+                            q.imageFile = await urlToFile(
+                                `data:image/png;base64,${q.imageFile.trim()}`, 
+                                `Question-${q.id}.png`,
+                                'image/png'
+                            );
+                        }
+                        return q;
+                    })
+                );
+                setQuestions(newQA);
+            }
+        };
+
+        if (selectedQuiz && selectedQuiz.value) {
+            fetchQuizWithQA();
+        }
+    }, [selectedQuiz]);
+
+
 
     const handleAddRemoveQuestion = (type, id) => {
         if (type === 'ADD') {
