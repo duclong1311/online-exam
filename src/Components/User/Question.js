@@ -1,12 +1,13 @@
 import _ from 'lodash';
+import { useState } from 'react';
+import Lightbox from "react-awesome-lightbox";
 
 const Question = ({ data, index, handleCheckBox }) => {
-    if (_.isEmpty(data)) {
-        return (
-            <>
 
-            </>
-        )
+    const [isPreviewImage, setIsPreviewImage] = useState(false)
+
+    if (_.isEmpty(data)) {
+        return (<></>);
     }
 
     const handleHandleCheckBox = (event, aId, qId) => {
@@ -18,7 +19,20 @@ const Question = ({ data, index, handleCheckBox }) => {
             {
                 data.image ?
                     <div className='q-image'>
-                        <img src={`data:image/png;base64,${data.image}`} alt='...' />
+                        <img
+                            style={{ cursor: 'pointer' }}
+                            src={`data:image/png;base64,${data.image}`}
+                            onClick={() => setIsPreviewImage(true)}
+                            alt='...'
+                        />
+                        {
+                            isPreviewImage === true &&
+                            <Lightbox
+                                image={`data:image/png;base64,${data.image}`}
+                                title={"Question image"}
+                                onClose={() => setIsPreviewImage(false)}
+                            />
+                        }
                     </div>
                     :
                     <div className='q-image'>
