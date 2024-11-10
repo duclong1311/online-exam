@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select'
 import './QuizQA.scss';
 import { RiImageAddFill } from "react-icons/ri";
@@ -7,7 +7,7 @@ import { IoMdRemoveCircleOutline } from "react-icons/io";
 import { v4 as uuidv4 } from 'uuid';
 import Lightbox from "react-awesome-lightbox";
 import _ from 'lodash';
-import { getAllQuizForAdmin, createNewAnswerForQuestion, createPostQuestionForQuiz, getQuizWithQA } from "../../../../Utils/apiServices";
+import { getAllQuizForAdmin, getQuizWithQA, postUpsertQA } from "../../../../Utils/apiServices";
 import { toast } from 'react-toastify';
 
 const QuizQA = () => {
@@ -62,31 +62,31 @@ const QuizQA = () => {
             });
     }
 
-    useEffect(() => {
-        const fetchQuizWithQA = async () => {
-            const res = await getQuizWithQA(selectedQuiz.value);
-            if (res && res.EC === 0) {
-                const newQA = await Promise.all(
-                    res.DT.qa.map(async q => {
-                        if (q.imageFile) {
-                            q.imageName = `Question - ${q.id} image`;
-                            q.imageFile = await urlToFile(
-                                `data:image/png;base64,${q.imageFile.trim()}`, 
-                                `Question-${q.id}.png`,
-                                'image/png'
-                            );
-                        }
-                        return q;
-                    })
-                );
-                setQuestions(newQA);
-            }
-        };
+    const fetchQuizWithQA = useCallback(async () => {
+        const res = await getQuizWithQA(selectedQuiz.value);
+        if (res && res.EC === 0) {
+            const newQA = await Promise.all(
+                res.DT.qa.map(async q => {
+                    if (q.imageFile) {
+                        q.imageName = `Question - ${q.id} image`;
+                        q.imageFile = await urlToFile(
+                            `data:image/png;base64,${q.imageFile.trim()}`,
+                            `Question-${q.id}.png`,
+                            'image/png'
+                        );
+                    }
+                    return q;
+                })
+            );
+            setQuestions(newQA);
+        }
+    }, [selectedQuiz]);
 
+    useEffect(() => {
         if (selectedQuiz && selectedQuiz.value) {
             fetchQuizWithQA();
         }
-    }, [selectedQuiz]);
+    }, [selectedQuiz, fetchQuizWithQA]);
 
 
 
@@ -190,18 +190,31 @@ const QuizQA = () => {
             return;
         }
 
-        console.log("questions", questions, selectedQuiz);
-        await Promise.all(questions.map(async (question) => {
-            const q = await createPostQuestionForQuiz(+selectedQuiz.value, question.description, question.imageFile);
+        let questionClone = _.cloneDeep(questions);
+        for (let i = 0; i < questionClone.length; i++) {
+            if (questionClone[i].imageFile) {
+                questionClone[i].imageFile =
+                    await toBase64(questionClone[i].imageFile);
+            }
+        }
 
-            await Promise.all(question.answers.map(async (answer) => {
-                await createNewAnswerForQuestion(answer.description, answer.isCorrect, q.DT.id);
-            }));
-        }));
+        let res = await postUpsertQA({
+            quizId: selectedQuiz.value,
+            questions: questionClone
+        });
 
-        toast.success('Create questions ans answers succed!');
-        setQuestions(initQuestions);
+        if (res && res.EC === 0) {
+            toast.success(res.EM)
+            fetchQuizWithQA();
+        }
     };
+
+    const toBase64 = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+    });
 
     return (
         <>
