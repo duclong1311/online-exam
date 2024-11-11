@@ -1,10 +1,20 @@
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-const PrivateRoute = ({ children }) => {
-    const isAuthenticated = useSelector(state => state.user.isAuthenticated);
+const PrivateRoute = ({ children, requiredRole }) => {
+    const { account, isAuthenticated } = useSelector(state => state.user);
 
-    return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+    if (!isAuthenticated) {
+        return <Navigate to="/login" />;
+    }
+
+    if (requiredRole && account.role !== requiredRole) {
+        toast.error(`You are ${account.role} and can't access this page!`);
+        return <Navigate to="/" />;
+    }
+
+    return children;
 }
 
 export default PrivateRoute;

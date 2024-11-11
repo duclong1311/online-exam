@@ -155,7 +155,6 @@ const DetailQuiz = (props) => {
                 show={isShowModalResult}
                 setShow={setIsShowModalResult}
                 dataModalResult={dataModalResult}
-
             />
         </div>
     )

@@ -37,7 +37,7 @@ const Layout = (props) => {
                     <Route
                         path="/user"
                         element={
-                            <PrivateRoute>
+                            <PrivateRoute requiredRole="USER">
                                 <ListQuiz />
                             </PrivateRoute>
                         }
@@ -48,7 +48,7 @@ const Layout = (props) => {
                 <Route
                     path="/admin"
                     element={
-                        <PrivateRoute>
+                        <PrivateRoute requiredRole="ADMIN">
                             <Admin />
                         </PrivateRoute>
                     }

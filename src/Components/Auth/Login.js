@@ -85,6 +85,7 @@ const Login = () => {
                                             value={values.password}
                                             onChange={handleChange}
                                             isInvalid={touched.password && !!errors.password}
+                                            onKeyDown={() => {}}
                                         />
                                         {
                                             isShowPassword ?
@@ -106,12 +107,12 @@ const Login = () => {
                                 <Button type="submit" className="w-100 mt-3 btn-dark" disabled={isLoading}>
                                     Login
                                     {
-                                        isLoading === true && 
+                                        isLoading === true &&
                                         <span>
                                             <AiOutlineLoading3Quarters className='loader-icon' />
                                         </span>
                                     }
-                                    
+
                                 </Button>
                             </Form>
                         </div>
