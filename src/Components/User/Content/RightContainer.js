@@ -19,6 +19,8 @@ const RightContainer = ({ dataQuiz, handleFinishQuiz, setIndex }) => {
     };
 
     const handleClickQuestion = (question, index) => {
+        setIndex(index);
+
         if(refDiv.current) {
             refDiv.current.forEach(item => {
                 if (item && item.className === "question clicked") {
@@ -35,7 +37,6 @@ const RightContainer = ({ dataQuiz, handleFinishQuiz, setIndex }) => {
         }
 
         refDiv.current[index].className = "question clicked";
-        setIndex(index);
     }
 
     return (
