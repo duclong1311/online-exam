@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 
 const CountDown = ({ onTimesUp }) => {
     const onTimesUpRef = useRef(onTimesUp);
-    const [count, setCount] = useState(5);
+    const [count, setCount] = useState(300);
 
     useEffect(() => {
         onTimesUpRef.current = onTimesUp;
