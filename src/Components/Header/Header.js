@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../Utils/apiServices';
 import { toast } from 'react-toastify';
 import { doLogout } from '../../Redux/Actions/userActions';
+import Language from './Language';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Header = () => {
     const account = useSelector(state => state.user.account);
 
     const dispatch = useDispatch();
-    
+
     const handleLogin = () => {
         navigate('/login');
     }
@@ -24,7 +25,7 @@ const Header = () => {
         navigate('/register');
     }
 
-    const handleLogout = async() =>  {
+    const handleLogout = async () => {
         let res = await logout(account.email, account.refresh_token);
         if (res && res.EC === 0) {
             dispatch(doLogout());
@@ -53,17 +54,16 @@ const Header = () => {
                             </>
                             :
                             <NavDropdown title="Settings" id="basic-nav-dropdown">
-                                <NavDropdown.Item href="#action/3.1">My profile</NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.2">
-                                    Another action
-                                </NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
+                                <NavDropdown.Item>My profile</NavDropdown.Item>
+                                <NavDropdown.Item>Another action</NavDropdown.Item>
+                                <NavDropdown.Item>Something</NavDropdown.Item>
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item onClick={() => handleLogout()}>
                                     Log out
                                 </NavDropdown.Item>
                             </NavDropdown>
                         }
+                        <Language />
                     </Nav>
                 </Navbar.Collapse>
             </Container>

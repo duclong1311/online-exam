@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { LiaEyeSlashSolid } from "react-icons/lia";
 import { LiaEyeSolid } from "react-icons/lia";
 import { postRegister } from '../../Utils/apiServices';
+import Language from '../Header/Language';
 
 
 
@@ -58,6 +59,7 @@ const Register = () => {
                         <div className='header'>
                             Already have an account?
                             <button className='btn btn-dark' onClick={() => navigate('/login')}>Login now!</button>
+                            <Language />
                         </div>
                         <div className='title col-4'>CodeGym-Blog</div>
                         <div className='welcome col-4'>Hello, who's this?</div>

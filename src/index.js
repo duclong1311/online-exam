@@ -9,7 +9,8 @@ import 'nprogress/nprogress.css';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "react-awesome-lightbox/build/style.css";
-
+// eslint-disable-next-line no-unused-vars
+import i18n from './Utils/i18n';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

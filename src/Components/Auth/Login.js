@@ -13,6 +13,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useState } from 'react';
 import { LiaEyeSlashSolid } from "react-icons/lia";
 import { LiaEyeSolid } from "react-icons/lia";
+import Language from '../Header/Language';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -55,6 +56,7 @@ const Login = () => {
                         <div className='header'>
                             Don't have an account yet?
                             <button className='btn btn-dark' onClick={() => navigate('/register')}>Sign up</button>
+                            <Language />
                         </div>
                         <div className='title col-4'>CodeGym-Blog</div>
                         <div className='welcome col-4'>Hello, who's this?</div>

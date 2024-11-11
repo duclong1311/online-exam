@@ -19,6 +19,12 @@ body {
         }
     }
 
+    .languages {
+        .dropdown-toggle::after {
+            display: none !important;
+        }
+    }
+
     .app-content {
         height: calc(100vh - 60px);
     }

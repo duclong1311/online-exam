@@ -8,6 +8,7 @@ import DashBoard from './Components/Admin/Content/DashBoard';
 import Login from './Components/Auth/Login';
 import Register from './Components/Auth/Register';
 import { ToastContainer } from 'react-toastify';
+import { Suspense } from 'react';
 import "react-toastify/dist/ReactToastify.css";
 import ListQuiz from "./Components/User/ListQuiz";
 import DetailQuiz from "./Components/User/DetailQuiz";
@@ -18,7 +19,7 @@ import PrivateRoute from "../src/Routes/PrivateRoute";
 
 const Layout = (props) => {
     return (
-        <>
+        <Suspense fallback={<h2>🌀 Loading...</h2>}>
             <ToastContainer
                 position="top-right"
                 autoClose={5000}
@@ -62,7 +63,7 @@ const Layout = (props) => {
                 <Route path='/register' element={<Register />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
-        </>
+        </Suspense>
     )
 }
 
