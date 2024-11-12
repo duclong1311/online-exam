@@ -24,7 +24,7 @@ const ModalUpdateUser = (props) => {
     const [username, setUsername] = useState(dataUpdate?.username || "");
     const [role, setRole] = useState(dataUpdate?.role || "USER");
     const [image, setImage] = useState(null);
-    const [previewImage, setPreviewImage] = useState(defaultAvatar); // Avatar mặc định ngay từ đầu
+    const [previewImage, setPreviewImage] = useState(defaultAvatar); 
 
     useEffect(() => {
         if (!_.isEmpty(dataUpdate)) {

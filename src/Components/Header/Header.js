@@ -10,9 +10,13 @@ import { toast } from 'react-toastify';
 import { doLogout } from '../../Redux/Actions/userActions';
 import { FaReact } from "react-icons/fa";
 import Language from './Language';
+import Profile from './MyProfileModal';
+import { useState } from 'react';
 
 const Header = () => {
     const navigate = useNavigate();
+
+    const [isShowModalProfile, setIsShowModalProfile] = useState(false);
 
     const isAuthenticated = useSelector(state => state.user.isAuthenticated);
     const account = useSelector(state => state.user.account);
@@ -37,41 +41,47 @@ const Header = () => {
     }
 
     return (
-        <Navbar expand="lg" className="bg-body-tertiary">
-            <Container>
-                <NavLink to={'/'} className={"navbar-brand"}>
-                    <span ><FaReact className='brand-icon' /></span>
-                    CodeGym
-                </NavLink>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="me-auto">
-                        <NavLink to={'/'} className={"nav-link"}>Home</NavLink>
-                        <NavLink to={'/user'} className={"nav-link"}>User</NavLink>
-                        <NavLink to={'/admin'} className={"nav-link"}>Admin</NavLink>
-                    </Nav>
-                    <Nav>
-                        {isAuthenticated === false ?
-                            <>
-                                <button className='btn-login' onClick={() => handleLogin()}>Log in</button>
-                                <button className='btn-signup' onClick={() => handleRegister()}>Sign up</button>
-                            </>
-                            :
-                            <NavDropdown title="Settings" id="basic-nav-dropdown">
-                                <NavDropdown.Item>My profile</NavDropdown.Item>
-                                <NavDropdown.Item>Another action</NavDropdown.Item>
-                                <NavDropdown.Item>Something</NavDropdown.Item>
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item onClick={() => handleLogout()}>
-                                    Log out
-                                </NavDropdown.Item>
-                            </NavDropdown>
-                        }
-                        <Language />
-                    </Nav>
-                </Navbar.Collapse>
-            </Container>
-        </Navbar>
+        <>
+            <Navbar expand="lg" className="bg-body-tertiary">
+                <Container>
+                    <NavLink to={'/'} className={"navbar-brand"}>
+                        <span ><FaReact className='brand-icon' /></span>
+                        CodeGym
+                    </NavLink>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                        <Nav className="me-auto">
+                            <NavLink to={'/'} className={"nav-link"}>Home</NavLink>
+                            <NavLink to={'/user'} className={"nav-link"}>User</NavLink>
+                            <NavLink to={'/admin'} className={"nav-link"}>Admin</NavLink>
+                        </Nav>
+                        <Nav>
+                            {isAuthenticated === false ?
+                                <>
+                                    <button className='btn-login' onClick={() => handleLogin()}>Log in</button>
+                                    <button className='btn-signup' onClick={() => handleRegister()}>Sign up</button>
+                                </>
+                                :
+                                <NavDropdown title="Settings" id="basic-nav-dropdown">
+                                    <NavDropdown.Item onClick={() => setIsShowModalProfile(true)}>My profile</NavDropdown.Item>
+                                    <NavDropdown.Item>Another action</NavDropdown.Item>
+                                    <NavDropdown.Item>Something</NavDropdown.Item>
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Item onClick={() => handleLogout()}>
+                                        Log out
+                                    </NavDropdown.Item>
+                                </NavDropdown>
+                            }
+                            <Language />
+                        </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>
+            <Profile 
+                show={isShowModalProfile}
+                setShow={setIsShowModalProfile}
+            />
+        </>
     );
 }
 
