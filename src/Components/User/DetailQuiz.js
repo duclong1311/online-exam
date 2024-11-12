@@ -32,6 +32,8 @@ const DetailQuiz = (props) => {
                             item.answers.isSelected = false;
                             answers.push(item?.answers);
                         });
+                        answers = _.orderBy(answers, ['id'], ['asc']);
+
                         return { questionId: key, answers, questionDescription, image };
                     })
                     .value()
@@ -103,7 +105,7 @@ const DetailQuiz = (props) => {
             });
         }
         let index = dataQuizClone.findIndex(item => +item.questionId === +questionId);
-        dataQuizClone[index] = question; // Tìm questionId cũ và cập nhật question mới có thuộc tính answer thay đổi thông qua questionId vào trong dataQuizzClone
+        dataQuizClone[index] = question;
         setDataQuiz(dataQuizClone);
     }
 
