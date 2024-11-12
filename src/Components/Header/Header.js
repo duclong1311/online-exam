@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../Utils/apiServices';
 import { toast } from 'react-toastify';
 import { doLogout } from '../../Redux/Actions/userActions';
+import { FaReact } from "react-icons/fa";
 import Language from './Language';
 
 const Header = () => {
@@ -38,7 +39,10 @@ const Header = () => {
     return (
         <Navbar expand="lg" className="bg-body-tertiary">
             <Container>
-                <NavLink to={'/'} className={"navbar-brand"}>CodeGym</NavLink>
+                <NavLink to={'/'} className={"navbar-brand"}>
+                    <span ><FaReact className='brand-icon' /></span>
+                    CodeGym
+                </NavLink>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">

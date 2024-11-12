@@ -6,6 +6,25 @@ body {
 
 .app-container {
     .header-container {
+        .navbar-brand {
+            .brand-icon {
+                font-size: 25px;
+                color: #00bfff;
+                animation: spin 5s infinite linear;
+                margin: 10px;
+            }
+
+            @keyframes spin {
+                from {
+                    transform: scale(1) rotate(0deg);
+                }
+                to {
+                    transform: scale(1) rotate(360deg);
+                }
+            }
+        }
+
+
         .navbar-nav {
             z-index: 10;
             background-color: rgba(0,0,0,0) !important;
