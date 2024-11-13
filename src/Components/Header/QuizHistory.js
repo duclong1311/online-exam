@@ -11,7 +11,14 @@ const QuizHistory = () => {
     useEffect(() => {
         const fetchDoingQuizHistory = async () => {
             const res = await getHistoryDoingQuiz();
-            res && res.EC === 0 ? setQuizHistory(res.DT.data) : toast.error("Can not connect to server");
+            if (res && res.EC === 0) {
+                let newData = res.DT.data;
+                newData.length > 7
+                    ? setQuizHistory(newData.slice(newData.length - 7, newData.length))
+                    : setQuizHistory(newData);
+            } else {
+                toast.error("Can not connect to server");
+            }
         }
         fetchDoingQuizHistory();
     }, []);
