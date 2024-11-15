@@ -48,6 +48,8 @@ const ManageUser = (props) => {
         setShowModalDeleteUser(true);
         setDataDelete(user);
     }
+
+    //render UI
     return (
         <>
             <div className="manage-user-container">
