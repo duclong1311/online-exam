@@ -9,8 +9,25 @@ import Lightbox from "react-awesome-lightbox";
 import _ from 'lodash';
 import { getAllQuizForAdmin, getQuizWithQA, postUpsertQA } from "../../../../Utils/apiServices";
 import { toast } from 'react-toastify';
+import { normalize, schema } from 'normalizr';
+import { useImmer } from 'use-immer';
 
 const QuizQA = () => {
+
+    const cauhoiId = uuidv4();
+    const dapanId = uuidv4();
+
+    const [cauHoiObj, setCauHoiObj] = useImmer({
+        [cauhoiId]: {
+            id: cauhoiId, description: '', imageFile: '', imageName: '',
+            answer: [dapanId]
+        }
+    });
+
+    const [dapAnObj, setDapAnObj] = useImmer({
+        [dapanId]: { id: dapanId, description: '', isCorrect: false }
+    });
+
     const initQuestions = [
         {
             id: uuidv4(),
@@ -28,7 +45,7 @@ const QuizQA = () => {
     ];
 
     const [selectedQuiz, setSelectedQuiz] = useState({});
-    const [questions, setQuestions] = useState(initQuestions);
+    const [questions, setQuestions] = useState([initQuestions]);
     const [isPreviewImage, setIsPreviewImage] = useState(false);
     const [dataImagePreview, setDataImagePreview] = useState({
         title: '',
@@ -78,7 +95,17 @@ const QuizQA = () => {
                     return q;
                 })
             );
-            setQuestions(newQA);
+            // setQuestions(newQA);
+
+            //normalize data
+            const answer = new schema.Entity("answer");
+            const question = new schema.Entity("question", {
+                answers: [answer]
+            })
+            const d = normalize(newQA, [question]);
+            console.log(">>>>Check data", d);
+            setCauHoiObj(d.entities.question);
+            setDapAnObj(d.entities.answer);
         }
     }, [selectedQuiz]);
 
@@ -92,92 +119,165 @@ const QuizQA = () => {
 
     const handleAddRemoveQuestion = (type, id) => {
         if (type === 'ADD') {
+            const cauhoiId = uuidv4();
+            const dapanId = uuidv4();
+
             const newQuestion = {
-                id: uuidv4(),
+                id: cauhoiId,
                 description: 'Question new',
                 imageFile: '',
                 imageName: '',
-                answers: [
-                    {
-                        id: uuidv4(),
-                        description: 'Answer 1',
-                        isCorrect: false,
-                    }
-                ]
+                answers: [dapanId]
             };
+
+            let newAnswer = {
+                id: dapanId,
+                description: 'Answer 1',
+                isCorrect: false,
+            }
+
+            setCauHoiObj(draft => {
+                draft[cauhoiId] = newQuestion
+            });
+            setDapAnObj(draft => {
+                draft[dapanId] = newAnswer
+            });
+
             setQuestions([...questions, newQuestion]);
         } else if (type === 'REMOVE') {
-            setQuestions(questions.filter(item => item.id !== id));
+
+            setCauHoiObj(draft => {
+                delete draft[id]
+            })
+            // setQuestions(questions.filter(item => item.id !== id));
         }
     };
 
 
-    const handleAddRemoveAnswer = (type, answerId, questionId) => {
-        const questionsClone = _.clone(questions);
-        const question = questionsClone.find(item => item.id === questionId);
+    const handleAddRemoveAnswer = (type, questionId, answerId) => {
+        // const questionsClone = _.clone(questions);
+        // const question = questionsClone.find(item => item.id === questionId);
 
-        if (question) {
-            if (type === 'ADD') {
-                const newAnswer = {
-                    id: uuidv4(),
-                    description: '',
-                    isCorrect: false,
-                };
-                question.answers.push(newAnswer);
-            } else if (type === 'REMOVE') {
-                question.answers = question.answers.filter(item => item.id !== answerId);
+        // if (question) {
+        //     if (type === 'ADD') {
+        //         const newAnswer = {
+        //             id: uuidv4(),
+        //             description: '',
+        //             isCorrect: false,
+        //         };
+        //         question.answers.push(newAnswer);
+        //     } else if (type === 'REMOVE') {
+        //         question.answers = question.answers.filter(item => item.id !== answerId);
+        //     }
+        //     setQuestions(questionsClone);
+        // }
+        if (type === 'ADD') {
+            const newAid = uuidv4();
+            const newAnswer = {
+                id: newAid,
+                description: '',
+                isCorrect: false
+            };
+
+            setDapAnObj(draft => {
+                draft[newAid] = newAnswer;
+            })
+            setCauHoiObj(draft => {
+                draft[questionId].answer.push(newAid);
+            });
+        }
+        if (type === 'REMOVE') {
+            if (cauHoiObj[questionId]) {
+                setCauHoiObj(draft => {
+                    let newAs = cauHoiObj[questionId].answers.filter(item => item !== answerId)
+                    draft[questionId].answers = newAs;
+                })
             }
-            setQuestions(questionsClone);
+
+            if (dapAnObj[answerId]) {
+                setDapAnObj(draft => {
+                    delete draft[answerId];
+                })
+            }
         }
-    };
+    }
 
     const handleOnChange = (type, questionId, value) => {
         if (type === 'QUESTION') {
-            setQuestions(questions.map(question =>
-                question.id === questionId
-                    ? { ...question, description: value }
-                    : question
-            ));
+            if (cauHoiObj[questionId]) {
+                setCauHoiObj(draft => {
+                    draft[questionId].description = value;
+                });
+            }
+            // setQuestions(questions.map(question =>
+            //     question.id === questionId
+            //         ? { ...question, description: value }
+            //         : question
+            // ));
         }
     };
 
     const handleOnChangeImage = (questionId, event) => {
-        const file = event.target?.files?.[0];
-        if (file) {
-            setQuestions(questions.map(question =>
-                question.id === questionId
-                    ? { ...question, imageFile: file, imageName: file.name }
-                    : question
-            ));
+        if (cauHoiObj[questionId] && event.target && event.target.file) {
+            setCauHoiObj(draft => {
+                draft[questionId].imageFile = event.target.files[0];
+                draft[questionId].imageName = event.target.files[0].name;
+            })
         }
+
+        // const file = event.target?.files?.[0];
+        // if (file) {
+        //     setQuestions(questions.map(question =>
+        //         question.id === questionId
+        //             ? { ...question, imageFile: file, imageName: file.name }
+        //             : question
+        //     ));
+        // }
     };
 
     const handleAnswerQuestion = (type, answerId, questionId, value) => {
-        setQuestions(questions.map(question =>
-            question.id === questionId
-                ? {
-                    ...question,
-                    answers: question.answers.map(answer =>
-                        answer.id === answerId
-                            ? type === 'CHECKBOX'
-                                ? { ...answer, isCorrect: value }
-                                : { ...answer, description: value }
-                            : answer
-                    )
+        // setQuestions(questions.map(question =>
+        //     question.id === questionId
+        //         ? {
+        //             ...question,
+        //             answers: question.answers.map(answer =>
+        //                 answer.id === answerId
+        //                     ? type === 'CHECKBOX'
+        //                         ? { ...answer, isCorrect: value }
+        //                         : { ...answer, description: value }
+        //                     : answer
+        //             )
+        //         }
+        //         : question
+        // ));
+        if (dapAnObj[answerId]) {
+            setDapAnObj(draft => {
+                if (type === 'CHECKBOX') {
+                    draft[answerId].isCorrect = value;
                 }
-                : question
-        ));
+                if (type === 'INPUT') {
+                    draft[answerId].description = value;
+                }
+            })
+        }
     };
 
     const handlePreviewImage = (questionId) => {
-        const question = questions.find(item => item.id === questionId);
-        if (question?.imageFile) {
+        if (cauHoiObj[questionId]) {
             setDataImagePreview({
-                url: URL.createObjectURL(question.imageFile),
-                title: question.imageName,
+                url: URL.createObjectURL(cauHoiObj[questionId].imageFile),
+                title: cauHoiObj[questionId].imageName,
             });
             setIsPreviewImage(true);
         }
+        // const question = questions.find(item => item.id === questionId);
+        // if (question?.imageFile) {
+        //     setDataImagePreview({
+        //         url: URL.createObjectURL(question.imageFile),
+        //         title: question.imageName,
+        //     });
+        //     setIsPreviewImage(true);
+        // }
     };
 
     const validateQuestionDescription = (description) => {
@@ -216,6 +316,12 @@ const QuizQA = () => {
         reader.onerror = reject;
     });
 
+    // console.log(">>>>Check cau hoi: ", cauHoiObj);
+
+    // const tifOptions = Object.keys(cauHoiObj).map((key, index) =>
+    //     console.log(">>>>>Check object", key, 'and value', cauHoiObj[key])
+    // );
+
     return (
         <>
             <div className="questions-container">
@@ -236,38 +342,37 @@ const QuizQA = () => {
                         Add questions:
                     </div>
                     {
-                        questions && questions.length > 0
-                        && questions.map((question, index) => (
-                            <div className='q-main mb-4' key={`${question.id}`}>
+                        Object.keys(cauHoiObj).map((keyQ, index) => (
+                            <div className='q-main mb-4' key={`${keyQ}`}>
                                 <div className='question-content'>
                                     <div className="form-floating description">
                                         <input
                                             type="type"
                                             // className="form-control is-invalid"
-                                            className={`form-control ${!validateQuestionDescription(question.description) ? 'is-invalid' : ''}`}
+                                            className={`form-control ${!validateQuestionDescription(cauHoiObj[keyQ].description) ? 'is-invalid' : ''}`}
                                             placeholder=""
-                                            value={question.description}
-                                            onChange={(event) => handleOnChange('QUESTION', question.id, event.target.value)}
+                                            value={cauHoiObj[keyQ].description}
+                                            onChange={(event) => handleOnChange('QUESTION', cauHoiObj[keyQ].id, event.target.value)}
                                         />
                                         <label>Question {index + 1}'s Description</label>
                                     </div>
 
                                     <div className='group-upload'>
-                                        <label className='label-up' htmlFor={`${question.id}`}>
+                                        <label className='label-up' htmlFor={`${cauHoiObj[keyQ].id}`}>
                                             <RiImageAddFill className='label-up' />
                                         </label>
                                         <input
-                                            id={`${question.id}`}
+                                            id={`${cauHoiObj[keyQ].id}`}
                                             type={'file'}
                                             hidden
-                                            onChange={(event) => handleOnChangeImage(question.id, event)}
+                                            onChange={(event) => handleOnChangeImage(cauHoiObj[keyQ].id, event)}
 
                                         >
                                         </input>
                                         <span>
                                             {
-                                                question.imageName
-                                                    ? <span onClick={() => handlePreviewImage(question.id)}>{question.imageName}</span>
+                                                cauHoiObj[keyQ].imageName
+                                                    ? <span onClick={() => handlePreviewImage(cauHoiObj[keyQ].id)}>{cauHoiObj[keyQ].imageName}</span>
                                                     : '0 file is uploaded'
                                             }
                                         </span>
@@ -280,10 +385,10 @@ const QuizQA = () => {
                                             Add
                                         </button>
                                         {
-                                            questions.length > 1 &&
+                                            Object.keys(cauHoiObj).length > 1 &&
                                             <button
                                                 className='btn btn-danger button-remove'
-                                                onClick={() => handleAddRemoveQuestion('REMOVE', question.id)}
+                                                onClick={() => handleAddRemoveQuestion('REMOVE', cauHoiObj[keyQ].id)}
                                             >
                                                 Remove
                                             </button>
@@ -292,32 +397,33 @@ const QuizQA = () => {
                                     </div>
                                 </div>
                                 {
-                                    question.answers && question.answers.length > 0
-                                    && question.answers.map((answer, index) => (
-                                        <div key={answer.id} className='anwsers-content'>
+                                    cauHoiObj[keyQ].answers && cauHoiObj[keyQ].answers.length > 0
+                                    && cauHoiObj[keyQ].answers.map((KeyA, index) => (
+                                        <div key={KeyA} className='anwsers-content'>
                                             <input
                                                 className='form-check-input iscorrect'
                                                 type='checkbox'
-                                                checked={answer.isCorrect}
-                                                onChange={(event) => handleAnswerQuestion('CHECKBOX', answer.id, question.id, event.target.checked)}
+                                                checked={dapAnObj[KeyA].isCorrect}
+                                                onChange={(event) =>
+                                                    handleAnswerQuestion('CHECKBOX', dapAnObj[KeyA].id, cauHoiObj[keyQ].id, event.target.checked)}
                                             />
                                             <div className="form-floating answer-name">
                                                 <input
-                                                    value={answer.description}
+                                                    value={dapAnObj[KeyA].description}
                                                     type='type'
                                                     className='form-control'
                                                     placeholder=''
-                                                    onChange={(event) => handleAnswerQuestion('INPUT', answer.id, question.id, event.target.value)}
+                                                    onChange={(event) => handleAnswerQuestion('INPUT', dapAnObj[KeyA].id, cauHoiObj[keyQ].id, event.target.value)}
                                                 />
                                                 <label>Answer {index + 1}</label>
                                             </div>
                                             <div className="btn-group">
-                                                <span onClick={() => handleAddRemoveAnswer('ADD', '', question.id)}>
+                                                <span onClick={() => handleAddRemoveAnswer('ADD', '', cauHoiObj[keyQ].id)}>
                                                     <IoIosAddCircleOutline className='icon-add' />
                                                 </span>
                                                 {
-                                                    question.answers.length > 1 &&
-                                                    <span onClick={() => handleAddRemoveAnswer('REMOVE', answer.id, question.id)}>
+                                                    cauHoiObj[keyQ].answers.length > 1 &&
+                                                    <span onClick={() => handleAddRemoveAnswer('REMOVE', cauHoiObj[keyQ].id, dapAnObj[KeyA].id)}>
                                                         <IoMdRemoveCircleOutline className='icon-remove' />
                                                     </span>
                                                 }
@@ -329,7 +435,7 @@ const QuizQA = () => {
                         ))
                     }
                     {
-                        questions && questions.length > 0 &&
+                        cauHoiObj && cauHoiObj.length > 0 &&
                         <div>
                             <button
                                 className='btn btn-warning'
