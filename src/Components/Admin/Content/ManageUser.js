@@ -5,9 +5,9 @@ import ModalUpdateUser from "./ModalUpdateUser";
 import ModalViewUser from "./ModalViewUser";
 import ModalDeleteUser from "./ModalDeleteUser";
 import TableUserPaginate from "./TableUserPaginate";
+const LIMIT_USER = 5;
 
 const ManageUser = (props) => {
-    const LIMIT_USER = 5;
     const [pageCount, setPageCount] = useState(0);
     const [showModalCreateUser, setShowModalCreateUser] = useState(false);
     const [showModalUpdateUser, setShowModalUpdateUser] = useState(false);
@@ -18,9 +18,13 @@ const ManageUser = (props) => {
     const [dataUpdate, setDataUpdate] = useState({});
     const [dataDelete, setDataDelete] = useState({});
     const [listUsers, setListUsers] = useState([]);
+    // const listUsers = useSelector((state) => state.fetchData.listUsers);
+    // const isLoading = useSelector((state) => state.fetchData.isLoading);
+    // const isError = useSelector((state) => state.fetchData.isError);
 
     useEffect(() => {
         fetchListUserWithPaginate(1);
+        // dispatch(fetchAllUser());
     }, []);
 
     // const fetchListUser = async () => {
